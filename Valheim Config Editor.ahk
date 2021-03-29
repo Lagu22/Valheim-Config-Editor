@@ -72,7 +72,6 @@ loadFileMapping(targetFile)
 	return settings
 }
 
-
 ; create a setting object based on current file data
 defineSetting(split, sect, description)
 {
@@ -111,23 +110,24 @@ getSettingID(TreeViewItemID, mapping)
 	return sID
 }
 
-;
+; Migrate oldList values to newList
 updateMapping(oldList, newList)
 {
 	local
 	; update the existing settings sections in the new list
-	msgbox, % oldList.length() . " " . newlist.length()
+	incr := 0
 	for i, newSett in newlist {
 		for j, oldSett in oldList {
 			if (newSett["section"] = oldSett["section"]) {
 				if (newSett["name"] = oldSett["name"]) {
 					newSett["value"] := oldSett["value"]
+					incr++
 					break
 				}
 			}
 		}
 	}
-	return newList
+	return [newList, incr]
 }
 
 
@@ -169,10 +169,10 @@ Gui, Add, Edit, vguiSearch gguiSearchEvent r1 w100 limit10 ys section,
 Gui, Add, Text, vguiTextResultCount r1 w75 ys+6, % "Results: "
 Gui, Add, TreeView, glistTreeEvent r10 w300 xm section
 Gui, Add, Text, vguiName r1 w500, % "Setting: "
-Gui, Add, Text, r1
 Gui, Add, Edit, vguiEdit gguiEditEvent r1 w100 limit10 +ReadOnly, 
-Gui, Add, GroupBox, w200 h165 xm ys xs+320, % "Description:"
-Gui, Add, Text, vguiDescr w150 r8 wrap xp+25 yp+30,
+Gui, Add, GroupBox, w200 h170 xm ys-5 xs+320, % "Description:"
+Gui, Add, Text, vguiDescr w+190 r11 wrap xp+5 yp+20,
+Gui, Font,
 Gui, Add, StatusBar,,
 SB_SetParts(450)
 settingsList := loadFileMapping(targetFile)
@@ -267,19 +267,20 @@ guiSearchEvent:
 	}
 	return
 
-;
+; Merge one files values with another files values
 guiMergeBtnEvent:
 	FileSelectFile, old_targetFile, 9,, % "Select old config file to get updates from", *.cfg
 	FileSelectFile, new_targetFile, 9,, % "Select new config file to update", *.cfg
 	if (old_targetFile = "" || new_targetFile = "") {
 		return
 	}
-	settingsList := updateMapping(loadFileMapping(old_targetFile), loadFileMapping(new_targetFile))
-	msgbox, % settingsList.length()
+	results := updateMapping(loadFileMapping(old_targetFile), loadFileMapping(new_targetFile))
+	settingsList := results[1]
 	loadTreeViewFromMapping(settingsList)
 	GuiControl, Text, guiTextResultCount, % "Results: " . settingsList.length()
 	GuiControl,, guiPathBox, % new_targetFile
 	saveRoutine(settingsList, new_targetFile)
+	MsgBox,,, % "Updated " . results[2] . " items in `n" . new_targetFile, 5
 	return
 
 ; If GUI is closed, Escape is pressed or the guiCloseEvent is called, save
