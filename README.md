@@ -11,10 +11,10 @@ The source .ahk and a compiled .exe are provided. If the device does not have Au
     To load a file into the UI press the "Select File" button then select the file. 
 
  * Search For A Setting
-    Begin typing in the search bar and the tree view and result count will update as while typing. 
+    Begin typing in the search bar, the tree view and result count will update as while typing. 
     
  * Update A Setting
-    To edit a setting first expand one of the sections using the "+" symbolt to the left. Select the desired setting and then edit the value in the bottom edit box. 
+    To edit a setting first expand one of the sections using the "+" symbol to the left. Select the desired setting and then edit the value in the bottom edit box. 
  
  * Merge Files
     Select the "Merge Files" button, select the file holding the current setting data then select the file which should receive this data. 
